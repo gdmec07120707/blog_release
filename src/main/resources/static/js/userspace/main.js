@@ -66,7 +66,8 @@ $(function(){
                      success: function(data){
                      	 if (data.success) {
                      		// 成功后，置换头像图片
-                     		 $(".blog-avatar").attr("src", data.avatarUrl);
+                     		toastr.success("置换成功");
+                     		 $("#blog-avatar").attr("src", data.body);
                      	 } else {
                      		 toastr.error("error!"+data.message);
                      	 }
