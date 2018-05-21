@@ -11,7 +11,7 @@
 $(function() {
 	
 	// 初始化 md 编辑器
-    /**$("#md").markdown({
+    $("#md").markdown({
         language: 'zh',
         fullscreen: {
             enable: true
@@ -23,7 +23,7 @@ $(function() {
     });
     
     // 初始化标签控件
-    $('.form-control-tag').tagEditor({
+    /**$('.form-control-tag').tagEditor({
         initialTags: [],
         maxTags: 5,
         delimiter: ', ',

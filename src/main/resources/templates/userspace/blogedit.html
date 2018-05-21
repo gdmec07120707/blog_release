@@ -23,7 +23,7 @@
                 <div class="card-block" th:object="${blogModel.blog}">
                     <input type="hidden" name="id" id="id" th:value="*{id}">
                     <input type="text" class="form-control" placeholder="请填写博客标题" maxlength="80" id="title" name="title" th:value="*{title}">
-                    <textarea class="blog-textarea" placeholder="请填写博客摘要" maxlength="300" id="summary" name="summary" th:value="*{summary}" ></textarea>
+                    <textarea class="blog-textarea" placeholder="请填写博客摘要" maxlength="300" id="summary" name="summary" th:text="*{summary}" ></textarea>
                     <hr>
                     <textarea id="md" data-provide="markdown" data-hidden-buttons="cmdImage" name="content"  th:text="*{content}"></textarea>
                     <hr>

@@ -185,7 +185,7 @@ public class UserspaceController {
      * @param id
      * @return
      */
-    @DeleteMapping
+    @DeleteMapping("/{username}/blogs/{id}")
     @PreAuthorize("authentication.name.equals(#username)")
     public ResponseEntity<Response> deleteBlog(@PathVariable("username") String username,@PathVariable("id")Long id){
         try {
