@@ -1,12 +1,14 @@
 package com.fong.blog.service.impl;
 
 import com.fong.blog.domain.Blog;
+import com.fong.blog.domain.Comment;
 import com.fong.blog.domain.User;
 import com.fong.blog.repository.BlogRepository;
 import com.fong.blog.service.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -52,7 +54,24 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public void readingIncrease(Long id) {
         Blog blog = blogRepository.findOne(id);
-        blog.setReading(blog.getReading()+1);
+        blog.setReadSize(blog.getReadSize()+1);
         blogRepository.save(blog);
+    }
+
+    @Override
+    public Blog createComment(Long id, String commentContent) {
+        Blog originalBlog = blogRepository.findOne(id);
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        originalBlog.setUser(user);
+        Comment comment = new Comment(user,commentContent);
+        originalBlog.addComment(comment);
+        return blogRepository.save(originalBlog);
+    }
+
+    @Override
+    public void removeComment(Long blogId, Long commentId) {
+        Blog originalBlog =  blogRepository.findOne(blogId);
+        originalBlog.removeComment(commentId);
+        blogRepository.save(originalBlog);
     }
 }

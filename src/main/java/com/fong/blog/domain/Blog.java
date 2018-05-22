@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 public class Blog implements Serializable{
@@ -49,14 +50,20 @@ public class Blog implements Serializable{
     @CreationTimestamp
     private Timestamp createTime;
 
-    @Column(name="reading")
-    private Long reading = 0L; // 访问量、阅读量
+    @Column(name="readSize")
+    private Integer readSize = 0; // 访问量、阅读量
 
-    @Column(name="comments")
-    private Long comments = 0L;  // 评论量
+    @Column(name="commentSize")
+    private Integer commentSize = 0;  // 评论量
 
-    @Column(name="likes")
-    private Long likes = 0L;  // 点赞量
+    @Column(name="likeSize")
+    private Integer likeSize = 0;  // 点赞量
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "blog_comment", joinColumns = @JoinColumn(name = "blog_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id", referencedColumnName = "id"))
+    private List<Comment> comments;
+
 
 
     protected Blog() {
@@ -115,25 +122,61 @@ public class Blog implements Serializable{
         return htmlContent;
     }
 
-    public Long getComments() {
-        return comments;
+    public Integer getCommentSize() {
+        return commentSize;
     }
-    public void setComments(Long comments) {
-        this.comments = comments;
-    }
-    public Long getLikes() {
-        return likes;
-    }
-    public void setLikes(Long likes) {
-        this.likes = likes;
-    }
-    public Long getReading() {
-        return reading;
-    }
-    public void setReading(Long reading) {
-        this.reading = reading;
+    public void setCommentSize(Integer commentSize) {
+        this.commentSize = commentSize;
     }
 
+    public Integer getReadSize() {
+        return readSize;
+    }
+
+    public void setReadSize(Integer readSize) {
+        this.readSize = readSize;
+    }
+
+    public Integer getLikeSize() {
+        return likeSize;
+    }
+
+    public void setLikeSize(Integer likeSize) {
+        this.likeSize = likeSize;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+        this.commentSize = comments.size();
+    }
+
+    /**
+     * 添加评论
+     * @param comment
+     */
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+        this.commentSize = this.comments.size();
+    }
+
+    /**
+     * 删除评论
+     * @param commentId
+     */
+    public void removeComment(Long commentId) {
+        for (int index=0; index < this.comments.size(); index ++ ) {
+            if (comments.get(index).getId() == commentId) {
+                this.comments.remove(index);
+                break;
+            }
+        }
+
+        this.commentSize = this.comments.size();
+    }
 
 
 }

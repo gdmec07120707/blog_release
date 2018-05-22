@@ -133,7 +133,7 @@ public class UserspaceController {
 
         Page<Blog> page = null;
         if(order.equals("hot")){
-            Sort sort = new Sort(Sort.Direction.DESC,"reading","comments","likes");
+            Sort sort = new Sort(Sort.Direction.DESC,"readSize","commentSize","likeSize");
             Pageable pageable = new PageRequest(pageIndex,pageSize,sort);
             page = blogService.listBlogsByTitleLikeAndSort(user,keyword,pageable);
         }
