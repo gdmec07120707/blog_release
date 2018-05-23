@@ -3,6 +3,7 @@ package com.fong.blog.service.impl;
 import com.fong.blog.domain.Blog;
 import com.fong.blog.domain.Comment;
 import com.fong.blog.domain.User;
+import com.fong.blog.domain.Vote;
 import com.fong.blog.repository.BlogRepository;
 import com.fong.blog.service.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +73,25 @@ public class BlogServiceImpl implements BlogService {
     public void removeComment(Long blogId, Long commentId) {
         Blog originalBlog =  blogRepository.findOne(blogId);
         originalBlog.removeComment(commentId);
+        blogRepository.save(originalBlog);
+    }
+
+    @Override
+    public Blog createVote(Long blogId) {
+        Blog originalBlog = blogRepository.findOne(blogId);
+        User user =  (User)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Vote vote = new Vote(user);
+        boolean isExist = originalBlog.addVote(vote);
+        if(isExist){
+            throw  new IllegalArgumentException("该用户已点赞");
+        }
+        return blogRepository.save(originalBlog);
+    }
+
+    @Override
+    public void removeVote(Long blogId, Long voteId) {
+        Blog originalBlog = blogRepository.findOne(blogId);
+        originalBlog.removeVote(voteId);
         blogRepository.save(originalBlog);
     }
 }

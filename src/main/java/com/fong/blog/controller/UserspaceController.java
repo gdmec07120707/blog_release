@@ -2,6 +2,7 @@ package com.fong.blog.controller;
 
 import com.fong.blog.domain.Blog;
 import com.fong.blog.domain.User;
+import com.fong.blog.domain.Vote;
 import com.fong.blog.service.BlogService;
 import com.fong.blog.service.UserService;
 import com.fong.blog.util.ConstraintViolationExceptionHandler;
@@ -133,7 +134,7 @@ public class UserspaceController {
 
         Page<Blog> page = null;
         if(order.equals("hot")){
-            Sort sort = new Sort(Sort.Direction.DESC,"readSize","commentSize","likeSize");
+            Sort sort = new Sort(Sort.Direction.DESC,"readSize","commentSize","voteSize");
             Pageable pageable = new PageRequest(pageIndex,pageSize,sort);
             page = blogService.listBlogsByTitleLikeAndSort(user,keyword,pageable);
         }
@@ -161,20 +162,36 @@ public class UserspaceController {
     public String listBlogsByOrder(
             @PathVariable("username") String username,
             @PathVariable("id") Long id,Model model) {
+        User principal = null;
+        Blog blog = blogService.getBlogById(id);
+
         //每次阅读数量+1
         blogService.readingIncrease(id);
 
         boolean isBlogOwner = false;
         if(SecurityContextHolder.getContext().getAuthentication()!=null&&
                 SecurityContextHolder.getContext().getAuthentication().isAuthenticated()){
-            User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if(principal!=null&&username.equals(principal.getUsername())){
                 isBlogOwner = true;
             }
         }
 
+        // 判断操作用户的点赞情况
+        List<Vote> votes = blog.getVotes();
+        Vote currentVote = null; // 当前用户的点赞情况
+
+        if (principal !=null) {
+            for (Vote vote : votes) {
+                vote.getUser().getUsername().equals(principal.getUsername());
+                currentVote = vote;
+                break;
+            }
+        }
+
         model.addAttribute("isBlogOwner",isBlogOwner);
-        model.addAttribute("blogModel",blogService.getBlogById(id));
+        model.addAttribute("blogModel",blog);
+        model.addAttribute("currentVote",currentVote);
         System.out.println("listBlogsByOrder:id======"+id+username );
         return "/userspace/blog";
     }
