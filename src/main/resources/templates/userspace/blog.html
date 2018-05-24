@@ -52,7 +52,9 @@
                     <div class="card-block">
 
 
-                        <h5>分类：<a href="/u/waylau/blogs?category=11">
+                        <h5>分类：<a th:href="'/u/'+${blogModel.user.username}+'/blogs?catalog='+${blogModel.catalog.id}"
+                                        th:text="${blogModel.catalog.name}"
+                                  href="/u/waylau/blogs?category=11">
                             Spring Data
                         </a></h5>
 

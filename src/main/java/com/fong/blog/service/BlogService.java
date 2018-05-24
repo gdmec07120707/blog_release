@@ -1,6 +1,7 @@
 package com.fong.blog.service;
 
 import com.fong.blog.domain.Blog;
+import com.fong.blog.domain.Catalog;
 import com.fong.blog.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +49,13 @@ public interface BlogService {
      */
     Page<Blog> listBlogsByTitleLikeAndSort(User suser, String title, Pageable pageable);
 
+    /**
+     * 根据分类进行查询
+     * @param catalog
+     * @param pageable
+     * @return
+     */
+    Page<Blog> listBlogsByCatalog(Catalog catalog,Pageable pageable);
 
     /**
      * 阅读量递增

@@ -49,6 +49,7 @@ $(function() {
             data:JSON.stringify({"id":Number($('#id').val()),
                         		    	"title": $('#title').val(),
                         		    	"summary": $('#summary').val() ,
+                        		    	"catalog":{"id":$('#catalogSelect').val()},
                         		    	"content": $('#md').val()}),
             beforeSend:function(request){
                             request.setRequestHeader(csrfHeader,csrfToken);

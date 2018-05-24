@@ -1,9 +1,6 @@
 package com.fong.blog.service.impl;
 
-import com.fong.blog.domain.Blog;
-import com.fong.blog.domain.Comment;
-import com.fong.blog.domain.User;
-import com.fong.blog.domain.Vote;
+import com.fong.blog.domain.*;
 import com.fong.blog.repository.BlogRepository;
 import com.fong.blog.service.BlogService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +47,11 @@ public class BlogServiceImpl implements BlogService {
         title = "%" + title + "%";
         Page<Blog> blogs =blogRepository.findByUserAndTitleLike(user,title,pageable);
         return blogs;
+    }
+
+    @Override
+    public Page<Blog> listBlogsByCatalog(Catalog catalog, Pageable pageable) {
+        return blogRepository.findByCatalog(catalog,pageable);
     }
 
     @Override
