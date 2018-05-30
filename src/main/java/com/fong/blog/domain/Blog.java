@@ -124,6 +124,10 @@ public class Blog implements Serializable{
         this.user = user;
     }
 
+    public void setCreateTime(Timestamp createTime) {
+        this.createTime = createTime;
+    }
+
     public Timestamp getCreateTime() {
         return createTime;
     }

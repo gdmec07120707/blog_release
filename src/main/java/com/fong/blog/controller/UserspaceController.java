@@ -240,7 +240,11 @@ public class UserspaceController {
      */
     @GetMapping("/{username}/blogs/edit/{id}")
     public ModelAndView editBlog(@PathVariable("username") String username,@PathVariable("id") Long id,Model model) {
+        User user = (User) userDetailsService.loadUserByUsername(username);
+        List<Catalog> catalogs = catalogService.listCatalogs(user);
+
         model.addAttribute("blog",blogService.getBlogById(id));
+        model.addAttribute("catalogs",catalogs);
         return new ModelAndView("/userspace/blogedit","blogModel",model);
     }
 
@@ -253,22 +257,41 @@ public class UserspaceController {
     @PostMapping("/{username}/blogs/edit")
     @PreAuthorize("authentication.name.equals(#username)")
     public ResponseEntity<Response> saveBlog(@PathVariable("username") String username, @RequestBody Blog blog) {
-        //分类不能为空
-        if(blog.getCatalog().getId()==null){
-            return ResponseEntity.ok().body(new Response(false,"请选择分类"));
+        if (blog.getCatalog().getId() == null) {
+            return ResponseEntity.ok().body(new Response(false,"未选择分类"));
         }
-
-        User user = (User) userDetailsService.loadUserByUsername(username);
-        blog.setUser(user);
+        Blog tempBlog = null;
         try {
-            blog =  blogService.saveBlog(blog);
+
+            // 判断是修改还是新增
+
+            if (blog.getId()>0) {
+                Blog orignalBlog = blogService.getBlogById(blog.getId());
+                orignalBlog.setTitle(blog.getTitle());
+                orignalBlog.setContent(blog.getContent());
+                orignalBlog.setSummary(blog.getSummary());
+                orignalBlog.setCatalog(blog.getCatalog());
+                orignalBlog.setTags(blog.getTags());
+                orignalBlog.setCreateTime(blog.getCreateTime());
+                tempBlog = blogService.saveBlog(orignalBlog,false);
+            } else {
+                User user = (User)userDetailsService.loadUserByUsername(username);
+                blog.setUser(user);
+                tempBlog = blogService.saveBlog(blog,true);
+
+            }
+
         } catch (ConstraintViolationException e)  {
             return ResponseEntity.ok().body(new Response(false, ConstraintViolationExceptionHandler.getMessage(e)));
         } catch (Exception e) {
             return ResponseEntity.ok().body(new Response(false, e.getMessage()));
         }
-        String redirectUrl = "/u/"+username+"/blogs/"+blog.getId();
+
+        String redirectUrl = "/u/" + username + "/blogs/" + tempBlog.getId();
         return ResponseEntity.ok().body(new Response(true, "处理成功", redirectUrl));
     }
+
+
+
 
 }

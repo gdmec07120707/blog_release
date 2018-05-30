@@ -1,13 +1,17 @@
 package com.fong.blog.service.impl;
 
 import com.fong.blog.domain.*;
+import com.fong.blog.domain.es.EsBlog;
 import com.fong.blog.repository.BlogRepository;
 import com.fong.blog.service.BlogService;
+import com.fong.blog.service.EsBlogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 
 @Service
 public class BlogServiceImpl implements BlogService {
@@ -15,14 +19,32 @@ public class BlogServiceImpl implements BlogService {
     @Autowired
     private BlogRepository blogRepository;
 
+    @Autowired
+    private EsBlogService esBlogService;
+
+    @Transactional
     @Override
-    public Blog saveBlog(Blog blog) {
-        return blogRepository.save(blog);
+    public Blog saveBlog(Blog blog,boolean isNew) {
+
+        EsBlog esBlog = null;
+
+        Blog returnBlog = blogRepository.save(blog);
+
+        if(isNew){
+            esBlog = new EsBlog(returnBlog);
+        }else{
+            esBlog = esBlogService.getEsBlogByBlogId(blog.getId());
+            esBlog.update(returnBlog);
+        }
+        esBlogService.updateEsBlog(esBlog);
+        return returnBlog;
     }
 
     @Override
     public void removeBlog(Long id) {
         blogRepository.delete(id);
+        EsBlog esBlog = esBlogService.getEsBlogByBlogId(id);
+        esBlogService.removeEsBlog(esBlog.getId());
     }
 
     @Override
@@ -58,6 +80,11 @@ public class BlogServiceImpl implements BlogService {
     public void readingIncrease(Long id) {
         Blog blog = blogRepository.findOne(id);
         blog.setReadSize(blog.getReadSize()+1);
+
+        EsBlog esBlog = esBlogService.getEsBlogByBlogId(blog.getId());
+        esBlog.setReadSize(esBlog.getReadSize()+1);
+        esBlogService.updateEsBlog(esBlog);
+
         blogRepository.save(blog);
     }
 

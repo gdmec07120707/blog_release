@@ -13,7 +13,7 @@ public interface BlogService {
      * @param blog
      * @return
      */
-    Blog saveBlog(Blog blog);
+    Blog saveBlog(Blog blog,boolean isNew);
 
     /**
      * 删除博客
